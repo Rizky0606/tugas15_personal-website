@@ -179,12 +179,23 @@ const register = (req, res) => {
 const addUser = async (req, res) => {
   try {
     const { inputName, inputEmail, inputPassword } = req.body;
-    const salt = 10;
-    await bcrypt.hash(inputPassword, salt, (err, hashPassword) => {
-      const query = `INSERT INTO "User" (name, email, password, "createdAt", "updatedAt") VALUES ('${inputName}', '${inputEmail}', '${hashPassword}', NOW(), NOW())`;
-      sequelize.query(query);
-      res.redirect("/login");
-    });
+
+    // checking email
+    const query = `SELECT * FROM "User" WHERE email='${inputEmail}'`;
+    let obj = await sequelize.query(query, { type: QueryTypes.SELECT });
+
+    if (obj.length) {
+      req.flash("danger", "User has already exists");
+      res.redirect("/register");
+    } else {
+      const salt = 10;
+      await bcrypt.hash(inputPassword, salt, (err, hashPassword) => {
+        const query = `INSERT INTO "User" (name, email, password, "createdAt", "updatedAt") VALUES ('${inputName}', '${inputEmail}', '${hashPassword}', NOW(), NOW())`;
+        sequelize.query(query);
+        req.flash("succes", "Congrats, User succes created account");
+        res.redirect("/login");
+      });
+    }
   } catch (error) {
     console.log(error);
   }

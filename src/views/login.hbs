@@ -104,6 +104,14 @@
       </div>
     {{/if}}
 
+    {{#if messages.succes}}
+      <div class="alert alert-success" role="alert">
+        <div class="container">
+          {{messages.succes}}
+        </div>
+      </div>
+    {{/if}}
+
     <main>
       <div class="form-project">
         <form method="post" action="/login">
